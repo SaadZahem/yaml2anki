@@ -1,0 +1,42 @@
+deck_name: "Agronomy Terms"
+
+styling:
+  css: |
+    .card {
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      text-align: left;
+      color: #2e3440;
+      background-color: #eceff4;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .badge {
+      background: #5e81ac;
+      color: white;
+      padding: 2px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .back-text {
+      color: #bf616a;
+      font-weight: bold;
+    }
+
+  front_template: |
+    <div class="badge">QUESTION</div>
+    <div class="front-text">{{Front}}</div>
+
+  back_template: |
+    <div class="badge">QUESTION</div>
+    <div class="front-text">{{Front}}</div>
+    <hr>
+    <div class="badge">ANSWER</div>
+    <div class="back-text">{{Back}}</div>
+
+cards:
+  - front: "What is **field capacity**?"
+    back: "The amount of soil moisture or water content held in soil after excess water has drained away."
+    tags: ["soil-science"]

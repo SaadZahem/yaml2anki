@@ -8,6 +8,19 @@ import yaml
 
 DEFAULT_ANKI_CONNECT_URL = "http://localhost:8765"
 
+DEFAULT_CSS = """
+.card {
+    font-family: arial;
+    font-size: 20px;
+    text-align: center;
+    color: black;
+    background-color: white;
+}
+"""
+
+DEFAULT_QFMT = "{{Front}}"
+DEFAULT_AFMT = '{{Front}}<hr id="answer">{{Back}}'
+
 
 def load_flashcards(yaml_path: str) -> dict:
     """Load and validate flashcard YAML structure."""
@@ -19,24 +32,24 @@ def load_flashcards(yaml_path: str) -> dict:
                 or "deck_name" not in data
                 or "cards" not in data
             ):
-                raise ValueError("YAML must contain 'deck_name' and 'cards' key.")
+                raise ValueError("YAML must contain 'deck_name' and 'cards' keys.")
             return data
     except Exception as e:
         print(f"Error loading YAML file: {e}")
         sys.exit(1)
 
 
-def generate_apkg(data: dict, output_path: str) -> None:
-    """Generate a .apkg file using genanki."""
-    # Generate stable pseudo-random IDs based on deck/model name
-    deck_id = random.Random(data["deck_name"]).randint(1000000000, 2000000000)
-    model_id = random.Random(data["deck_name"] + "_model").randint(
-        1000000000, 2000000000
-    )
+def build_genanki_model(deck_name: str, styling: dict) -> genanki.Model:
+    """Dynamically construct a genanki Model based on user styling or defaults."""
+    model_id = random.Random(deck_name + "_model").randint(1000000000, 2000000000)
 
-    model = genanki.Model(
+    css = styling.get("css", DEFAULT_CSS)
+    qfmt = styling.get("front_template", DEFAULT_QFMT)
+    afmt = styling.get("back_template", DEFAULT_AFMT)
+
+    return genanki.Model(
         model_id,
-        "Yanki Basic Model",
+        f"Yanki Model ({deck_name})",
         fields=[
             {"name": "Front"},
             {"name": "Back"},
@@ -44,13 +57,22 @@ def generate_apkg(data: dict, output_path: str) -> None:
         templates=[
             {
                 "name": "Card 1",
-                "qfmt": "{{Front}}",
-                "afmt": '{{Front}}<hr id="answer">{{Back}}',
+                "qfmt": qfmt,
+                "afmt": afmt,
             },
         ],
+        css=css,
     )
 
-    deck = genanki.Deck(deck_id, data["deck_name"])
+
+def generate_apkg(data: dict, output_path: str) -> None:
+    """Generate a .apkg file using genanki with custom styling."""
+    deck_name = data["deck_name"]
+    deck_id = random.Random(deck_name).randint(1000000000, 2000000000)
+
+    styling = data.get("styling", {})
+    model = build_genanki_model(deck_name, styling)
+    deck = genanki.Deck(deck_id, deck_name)
 
     for card in data.get("cards", []):
         front = card.get("front", "")
@@ -69,32 +91,64 @@ def generate_apkg(data: dict, output_path: str) -> None:
 
 
 def import_to_ankiconnect(data: dict, url: str = DEFAULT_ANKI_CONNECT_URL) -> None:
-    """Directly import cards into a running Anki instance via AnkiConnect."""
+    """Import cards via AnkiConnect, creating/updating a custom model if requested."""
     deck_name = data["deck_name"]
+    styling = data.get("styling", {})
 
     def invoke(action, **params):
         response = requests.post(
             url, json={"action": action, "version": 6, "params": params}
         ).json()
-        if len(response) != 2:
-            raise Exception("Response has an unexpected number of fields")
-        if "error" not in response or "result" not in response:
-            raise Exception("Response is missing required fields")
-        if response["error"] is not None:
+        if response.get("error") is not None:
             raise Exception(response["error"])
-        return response["result"]
+        return response.get("result")
 
     try:
-        # Create deck if it doesn't exist
         invoke("createDeck", deck=deck_name)
 
-        # Prepare notes
+        model_name = f"Yanki - {deck_name}"
+        existing_models = invoke("modelNames")
+
+        # Create or update the custom note type in Anki
+        if model_name not in existing_models:
+            invoke(
+                "createModel",
+                modelName=model_name,
+                inOrderFields=["Front", "Back"],
+                css=styling.get("css", DEFAULT_CSS),
+                cardTemplates=[
+                    {
+                        "Name": "Card 1",
+                        "Front": styling.get("front_template", DEFAULT_QFMT),
+                        "Back": styling.get("back_template", DEFAULT_AFMT),
+                    }
+                ],
+            )
+        elif "styling" in data:
+            # Update existing model CSS/templates if provided
+            invoke(
+                "updateModelStyling",
+                model={"name": model_name, "css": styling.get("css", DEFAULT_CSS)},
+            )
+            invoke(
+                "updateModelTemplates",
+                model={
+                    "name": model_name,
+                    "templates": {
+                        "Card 1": {
+                            "Front": styling.get("front_template", DEFAULT_QFMT),
+                            "Back": styling.get("back_template", DEFAULT_AFMT),
+                        }
+                    },
+                },
+            )
+
         notes = []
         for card in data.get("cards", []):
             notes.append(
                 {
                     "deckName": deck_name,
-                    "modelName": "Basic",
+                    "modelName": model_name,
                     "fields": {
                         "Front": str(card.get("front", "")),
                         "Back": str(card.get("back", "")),
@@ -103,7 +157,6 @@ def import_to_ankiconnect(data: dict, url: str = DEFAULT_ANKI_CONNECT_URL) -> No
                 }
             )
 
-        # Add notes
         result = invoke("addNotes", notes=notes)
         added_count = sum(1 for n in result if n is not None)
         print(
@@ -111,9 +164,7 @@ def import_to_ankiconnect(data: dict, url: str = DEFAULT_ANKI_CONNECT_URL) -> No
         )
 
     except requests.exceptions.ConnectionError:
-        print(
-            "Error: Could not connect to AnkiConnect. Make sure Anki is running and AnkiConnect is installed."
-        )
+        print("Error: Could not connect to AnkiConnect. Ensure Anki is running.")
         sys.exit(1)
     except Exception as e:
         print(f"AnkiConnect Error: {e}")
@@ -122,7 +173,7 @@ def import_to_ankiconnect(data: dict, url: str = DEFAULT_ANKI_CONNECT_URL) -> No
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Yanki: YAML to Anki flashcard converter/importer"
+        description="Yanki: YAML to Anki converter with custom styling"
     )
     parser.add_argument("yaml_file", help="Path to input YAML file")
 
@@ -132,13 +183,11 @@ def main():
         "-i",
         "--import-direct",
         action="store_true",
-        help="Import directly into Anki via AnkiConnect",
+        help="Import directly via AnkiConnect",
     )
 
     parser.add_argument(
-        "--url",
-        default=DEFAULT_ANKI_CONNECT_URL,
-        help="AnkiConnect API URL (default: http://localhost:8765)",
+        "--url", default=DEFAULT_ANKI_CONNECT_URL, help="AnkiConnect API URL"
     )
 
     args = parser.parse_args()

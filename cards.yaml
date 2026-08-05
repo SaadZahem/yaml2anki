@@ -1,0 +1,9 @@
+deck_name: "Python Basics"
+cards:
+  - front: "What is a `list` in Python?"
+    back: "An ordered, mutable sequence of elements."
+    tags: ["python", "data-structures"]
+
+  - front: "How do you define a function?"
+    back: "Using the <code>def</code> keyword."
+    tags: ["python", "syntax"]

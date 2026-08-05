@@ -25,7 +25,7 @@ The program takes up a YAML file of [a specific format](#input-file-format) and 
 2. [Import to anki via AnkiConnect](#import-to-anki)
 3. [Generate a printable document of flashcards](#print)
 
-## input file format
+### input file format
 
 The following is a simple example of a valid YAML file.
 

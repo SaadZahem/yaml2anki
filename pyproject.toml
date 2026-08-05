@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "yanki"
+name = "yaml2anki"
 version = "0.1.0"
 description = "YAML to Anki converter and printable flashcard generator"
 readme = "README.md"
@@ -16,4 +16,4 @@ dependencies = [
 ]
 
 [project.scripts]
-yanki = "yanki.__main__:main"
+yaml2anki = "yaml2anki.__main__:main"

@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "yanki"
 version = "0.1.0"
-description = "Create anki flashcards from yaml"
+description = "YAML to Anki converter and printable flashcard generator"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -10,3 +14,6 @@ dependencies = [
     "requests>=2.34.2",
     "weasyprint>=69.0",
 ]
+
+[project.scripts]
+yanki = "yanki.__main__:main"

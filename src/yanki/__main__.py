@@ -278,7 +278,7 @@ def generate_html(data: dict, output_html_path: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="yanki", description="Yanki: Create Anki flashcards from YAML"
+        prog="yanki", description="Create anki flashcards from YAML."
     )
     parser.add_argument("yaml_file", help="Path to input YAML file")
 

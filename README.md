@@ -1,6 +1,6 @@
 # yanki
 
-Create anki flashcards from YAML.
+YAML to Anki converter and printable flashcard generator.
 
 ## Usage
 

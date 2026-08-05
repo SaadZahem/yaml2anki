@@ -286,9 +286,9 @@ def main():
     group.add_argument("-o", "--output", help="Output .apkg file path")
     group.add_argument(
         "-i",
-        "--import-direct",
+        "--import",
         action="store_true",
-        help="Import directly via AnkiConnect",
+        help="Import to anki via AnkiConnect",
     )
     group.add_argument("--pdf", help="Output printable PDF file path")
     group.add_argument("--html", help="Output printable HTML file path")

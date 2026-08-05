@@ -278,7 +278,7 @@ def generate_html(data: dict, output_html_path: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Yanki: Create Anki flashcards from YAML"
+        prog="yanki", description="Yanki: Create Anki flashcards from YAML"
     )
     parser.add_argument("yaml_file", help="Path to input YAML file")
 
@@ -295,6 +295,10 @@ def main():
     parser.add_argument(
         "--url", default=DEFAULT_ANKI_CONNECT_URL, help="AnkiConnect API URL"
     )
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        exit(0)
 
     args = parser.parse_args()
     data = load_flashcards(args.yaml_file)

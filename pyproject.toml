@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "yaml2anki"
-version = "0.1.2"
+version = "0.1.3"
 description = "YAML to Anki converter and printable flashcard generator"
 keywords = ["anki", "flashcards", "yaml", "pdf", "print", "weasyprint"]
 readme = "README.md"

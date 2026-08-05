@@ -15,4 +15,5 @@ DEFAULT_QFMT = "{{Front}}"
 DEFAULT_AFMT = '{{Front}}<hr id="answer">{{Back}}'
 
 package_dir = pathlib.Path(__file__).parent
+PRINT_CSS = (package_dir / "print_styles.css").read_text()
 PRINT_TEMPLATE_HTML = string.Template((package_dir / "print_template.html").read_text())

@@ -99,6 +99,7 @@ class Printer:
 
         return defaults.PRINT_TEMPLATE_HTML.safe_substitute(
             deck_name=deck_name,
+            base_css=defaults.PRINT_CSS,
             custom_css=custom_css,
             front_rows="\n".join(front_rows_html),
             back_rows="\n".join(back_rows_html),

@@ -4,11 +4,11 @@ YAML to Anki converter and printable flashcard generator.
 
 ## Usage
 
-The program takes up a YAML file of [a specific format](#input) and does one of the following actions.
+The program takes up a YAML file of [a specific format](#input-file-format) and does one of the following actions.
 
 1. [Create .apkg file](#apkg)
-2. [Import to anki via AnkiConnect](#import)
-3. [Generate a printable document of flashcards](print)
+2. [Import to anki via AnkiConnect](#import-to-anki)
+3. [Generate a printable document of flashcards](#print)
 
 ### apkg
 

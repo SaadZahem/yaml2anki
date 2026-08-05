@@ -1,5 +1,10 @@
 # yaml2anki
 
+[![PyPI Version](https://img.shields.io/pypi/v/yaml2anki.svg)](https://pypi.org/project/yaml2anki/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/yaml2anki.svg)](https://pypi.org/project/yaml2anki/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/SaadZahem/yaml2anki/actions/workflows/publish.yml/badge.svg)](https://github.com/SaadZahem/yaml2anki/actions)
+
 YAML to Anki converter and printable flashcard generator.
 
 ## Usage
